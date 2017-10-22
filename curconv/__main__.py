@@ -1,52 +1,48 @@
 import argparse
 import os
-import sys
 
 from forex_python.converter import CurrencyRates
-from yaml import YAMLError, load
 
-DEFAULT_CONFIGURATION_FILE_PATH = [
-    os.getenv('HOME') + "/.curconv.yaml",
-    "./curconv.yaml"
+from configuration import YAMLConfigurationFileLoader
+
+DEFAULT_CONFIGURATION_FILE_PATHS = [
+    os.path.join(os.getenv('HOME'), ".curconv.yaml"),
+    os.path.join(os.getcwd(), "curconv.yaml")
 ]
 
 OUTPUT_FORMAT = "{amount} {currency}"
 
 
-def load_configuration_from_file(file):
-    """
-    Attempt to load configuration from a given file or from known file paths.
-    """
-    try:
-        if file:
-            return load(file)
-        else:
-            for path in DEFAULT_CONFIGURATION_FILE_PATH:
-                try:
-                    return load(open(path, 'r'))
-                except FileNotFoundError:
-                    pass
-        return None
-    except YAMLError:
-        sys.exit('Malformed configuration file!')
-
-
-def main():
+def parse_arguments():
     parser = argparse.ArgumentParser(
         description='Simple currency conversion tool :-)'
     )
-    parser.add_argument('amount', type=float,
+    parser.add_argument('amount',
+                        type=float,
                         help='amount to convert to other currency')
-    parser.add_argument('from_currency', type=str, nargs='?', default=None,
+    parser.add_argument('from_currency',
+                        type=str,
+                        nargs='?',
+                        default=None,
                         help='currency from which you want to convert')
-    parser.add_argument('to_currencies', type=str, nargs='*',
+    parser.add_argument('to_currencies',
+                        type=str,
+                        nargs='*',
                         help='currency to which you want to convert')
-    parser.add_argument('--conf', dest='configuration_file',
+    parser.add_argument('--conf',
                         type=argparse.FileType('r'),
-                        default=None, help='configuration file')
+                        dest='configuration_file',
+                        default=None,
+                        help='configuration file')
+    return parser.parse_args()
 
-    arguments = parser.parse_args()
-    conf = load_configuration_from_file(arguments.configuration_file)
+
+def main():
+    arguments = parse_arguments()
+
+    loader = YAMLConfigurationFileLoader(arguments.configuration_file,
+                                         DEFAULT_CONFIGURATION_FILE_PATHS)
+    conf = loader.load_from_file()
 
     amount = arguments.amount
 
