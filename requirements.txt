@@ -1,0 +1,8 @@
+flake8==3.4.1
+forex-python
+ipdb==0.10.3
+ipdbplugin
+ipython==6.2.0
+isort==4.2.15
+nose==1.3.7
+pytest==3.2.2

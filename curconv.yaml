@@ -1,0 +1,9 @@
+# Default  values of currencies to use:
+
+from_currency: PLN
+
+to_currencies:
+    - PLN
+    - EUR
+    - USD
+    - GBP
